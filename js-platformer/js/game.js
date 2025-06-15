@@ -1,0 +1,110 @@
+let currentLevelData = null;
+let currentLevelIndex = 0;
+
+const gameScreen = {
+    enter: function() {
+        console.log("Entered game screen.");
+        if (currentLevelData) {
+            this.level = new Level(currentLevelData);
+        } else {
+            // Default to level 0 if no level is passed
+            currentLevelIndex = 0;
+            this.level = new Level(LEVELS[currentLevelIndex]);
+        }
+        // Start player at the bottom of the level
+        this.player = new Player(100, (this.level.tiles.length - 2) * this.level.tileSize);
+        camera.init(this.level); // Initialize camera
+        this.coinsCollected = 0;
+        this.message = '';
+        this.messageTimer = 0;
+
+        this.keys = {};
+        this.keyDownHandler = this.handleKeyDown.bind(this);
+        this.keyUpHandler = this.handleKeyUp.bind(this);
+        window.addEventListener("keydown", this.keyDownHandler);
+        window.addEventListener("keyup", this.keyUpHandler);
+    },
+    exit: function() {
+        console.log("Exiting game screen.");
+        window.removeEventListener("keydown", this.keyDownHandler);
+        window.removeEventListener("keyup", this.keyUpHandler);
+        currentLevelData = null;
+    },
+    update: function() {
+        this.handleInput();
+        const playerStatus = this.player.update(this.level);
+        camera.update(this.player);
+
+        if (playerStatus === 'coin_collected') {
+            this.coinsCollected++;
+        } else if (playerStatus === 'goal_reached') {
+            if (this.coinsCollected === this.level.totalCoins) {
+                progressManager.markLevelAsComplete(currentLevelIndex);
+                this.levelComplete();
+            } else {
+                this.message = "Collect all coins to finish!";
+                this.messageTimer = 120; // Show message for 2 seconds
+            }
+        }
+
+        if (this.messageTimer > 0) {
+            this.messageTimer--;
+            if (this.messageTimer === 0) {
+                this.message = '';
+            }
+        }
+    },
+    draw: function(ctx) {
+        ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+        ctx.save();
+        ctx.translate(0, -camera.y);
+
+        this.level.draw(ctx);
+        this.player.draw(ctx);
+
+        ctx.restore();
+
+        // Draw UI
+        ctx.fillStyle = 'white';
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Coins: ${this.coinsCollected} / ${this.level.totalCoins}`, 20, 40);
+
+        if (this.messageTimer > 0) {
+            ctx.textAlign = 'center';
+            ctx.fillText(this.message, GAME_WIDTH / 2, 80);
+        }
+    },
+    handleKeyDown: function(e) {
+        this.keys[e.key] = true;
+        if (e.key === "Escape") {
+            this.exit();
+            switchScreen(menuScreen);
+        }
+    },
+    handleKeyUp: function(e) {
+        this.keys[e.key] = false;
+    },
+    setLevel: function(levelData, levelIndex) {
+        currentLevelData = levelData;
+        currentLevelIndex = levelIndex;
+    },
+    handleInput: function() {
+        this.player.velocityX = 0;
+        if (this.keys['ArrowLeft']) {
+            this.player.velocityX = -MOVE_SPEED;
+        }
+        if (this.keys['ArrowRight']) {
+            this.player.velocityX = MOVE_SPEED;
+        }
+        if (this.keys[' ']) { // Space bar for jump
+            this.player.jump();
+        }
+    },
+    levelComplete: function() {
+        console.log(`Level ${currentLevelIndex + 1} complete!`);
+        this.exit();
+        switchScreen(levelCompleteScreen);
+    }
+};
