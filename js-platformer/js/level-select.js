@@ -32,10 +32,18 @@ const levelSelectScreen = {
         }
     },
     handleKeyDown: function(e) {
-        if (e.key === "ArrowDown") {
-            this.selectedLevel = (this.selectedLevel + 1) % LEVELS.length;
+                if (e.key === "ArrowDown") {
+            let nextLevel = this.selectedLevel;
+            do {
+                nextLevel = (nextLevel + 1) % LEVELS.length;
+            } while (!progressManager.isLevelUnlocked(nextLevel) && nextLevel !== this.selectedLevel);
+            this.selectedLevel = nextLevel;
         } else if (e.key === "ArrowUp") {
-            this.selectedLevel = (this.selectedLevel - 1 + LEVELS.length) % LEVELS.length;
+            let prevLevel = this.selectedLevel;
+            do {
+                prevLevel = (prevLevel - 1 + LEVELS.length) % LEVELS.length;
+            } while (!progressManager.isLevelUnlocked(prevLevel) && prevLevel !== this.selectedLevel);
+            this.selectedLevel = prevLevel;
         } else if (e.key === "Enter") {
             if (progressManager.isLevelUnlocked(this.selectedLevel)) {
                 this.selectLevel();

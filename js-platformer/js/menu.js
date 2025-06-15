@@ -2,8 +2,10 @@ const menuScreen = {
     enter: function() {
         console.log("Entered menu screen.");
         this.menuText = "JS Platformer";
-        this.options = ["Start Game", "Select Level", "Level Editor"];
+        this.options = ["Start Game", "Select Level", "Level Editor", "Reset Progress"];
         this.selectedOption = 0;
+        this.message = '';
+        this.messageTimer = 0;
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
@@ -12,7 +14,12 @@ const menuScreen = {
         window.removeEventListener("keydown", this.keyDownHandler);
     },
     update: function() {
-        // Nothing to update in a static menu
+        if (this.messageTimer > 0) {
+            this.messageTimer--;
+            if (this.messageTimer === 0) {
+                this.message = '';
+            }
+        }
     },
     draw: function(ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -30,6 +37,12 @@ const menuScreen = {
             }
             ctx.fillText(this.options[i], GAME_WIDTH / 2, 300 + i * 50);
         }
+        
+        if (this.messageTimer > 0) {
+            ctx.fillStyle = 'green';
+            ctx.font = '24px Arial';
+            ctx.fillText(this.message, GAME_WIDTH / 2, GAME_HEIGHT - 50);
+        }
     },
     handleKeyDown: function(e) {
         if (e.key === "ArrowDown") {
@@ -41,16 +54,26 @@ const menuScreen = {
         }
     },
     selectOption: function() {
-        this.exit();
-        switch (this.selectedOption) {
-            case 0:
+        const option = this.options[this.selectedOption];
+        if (option !== "Reset Progress") {
+            this.exit();
+        }
+
+        switch (option) {
+            case "Start Game":
+                gameScreen.setLevel(LEVELS[0], 0);
                 switchScreen(gameScreen);
                 break;
-            case 1:
+            case "Select Level":
                 switchScreen(levelSelectScreen);
                 break;
-            case 2:
+            case "Level Editor":
                 switchScreen(editorScreen);
+                break;
+            case "Reset Progress":
+                progressManager.resetProgress();
+                this.message = "Progress has been reset!";
+                this.messageTimer = 120; // Show for 2 seconds
                 break;
         }
     }

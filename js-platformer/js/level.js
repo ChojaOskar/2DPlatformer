@@ -3,7 +3,7 @@ class Level {
         this.tileSize = 40;
         this.totalCoins = 0;
         if (levelData) {
-            this.tiles = levelData;
+            this.tiles = levelData.map(row => [...row]); // Create a deep copy
         } else {
             // Default level if none is provided
             this.tiles = [

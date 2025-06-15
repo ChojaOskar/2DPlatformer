@@ -25,6 +25,7 @@ function gameLoop() {
 }
 
 window.onload = function() {
+    progressManager.loadProgress();
     switchScreen(menuScreen);
     requestAnimationFrame(gameLoop);
 };
