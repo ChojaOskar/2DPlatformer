@@ -1,6 +1,7 @@
-const winScreen = {
+const gameOverScreen = {
     enter: function() {
-        console.log("Entered win screen.");
+        progressManager.resetProgress();
+        console.log("Entered game over screen and reset progress.");
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
@@ -8,14 +9,17 @@ const winScreen = {
         window.removeEventListener("keydown", this.keyDownHandler);
     },
     update: function() {
-        
+      
     },
     draw: function(ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        ctx.fillStyle = 'red';
         ctx.textAlign = 'center';
         ctx.font = '50px Arial';
-        ctx.fillText("You Win!", GAME_WIDTH / 2, 200);
+        ctx.fillText("Game Over", GAME_WIDTH / 2, 200);
+        ctx.fillStyle = 'white';
         ctx.font = '30px Arial';
         ctx.fillText("Press Enter to return to the menu", GAME_WIDTH / 2, 300);
     },

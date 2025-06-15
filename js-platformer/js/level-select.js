@@ -2,7 +2,7 @@ const levelSelectScreen = {
     enter: function() {
         console.log("Successfully entered level select screen.");
         this.selectedLevel = 0;
-        progressManager.loadProgress(); // Make sure progress is up to date
+        progressManager.loadProgress(); 
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
@@ -11,7 +11,7 @@ const levelSelectScreen = {
         window.removeEventListener("keydown", this.keyDownHandler);
     },
     update: function() {
-        // Nothing to update in a static menu
+        
     },
     draw: function(ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);

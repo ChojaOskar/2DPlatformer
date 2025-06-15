@@ -13,6 +13,7 @@ const gameScreen = {
         }
         // Start player at the bottom of the level
         this.player = new Player(100, (this.level.tiles.length - 2) * this.level.tileSize);
+        this.player.lives = 3; 
         camera.init(this.level); // Initialize camera
         this.coinsCollected = 0;
         this.message = '';
@@ -35,6 +36,11 @@ const gameScreen = {
         const playerStatus = this.player.update(this.level);
         camera.update(this.player);
 
+        // Update enemies
+        if (this.level.enemies) {
+            this.level.enemies.forEach(enemy => enemy.update(this.level));
+        }
+
         if (playerStatus === 'coin_collected') {
             this.coinsCollected++;
         } else if (playerStatus === 'goal_reached') {
@@ -43,7 +49,26 @@ const gameScreen = {
                 this.levelComplete();
             } else {
                 this.message = "Collect all coins to finish!";
-                this.messageTimer = 120; // Show message for 2 seconds
+                this.messageTimer = 120; 
+            }
+        } else if (playerStatus === 'enemy_killed') {
+            
+        } else if (playerStatus === 'enemy_collision') {
+            this.player.lives--;
+            this.player.isInvincible = true;
+            this.player.invincibilityTimer = 90; 
+
+            if (this.player.lives <= 0) {
+                this.exit();
+                switchScreen(gameOverScreen);
+            } else {
+                this.message = `You lost a life! ${this.player.lives} lives left.`;
+                this.messageTimer = 120;
+                // Respawn player
+                this.player.x = this.player.respawnPoint.x;
+                this.player.y = this.player.respawnPoint.y;
+                this.player.velocityX = 0;
+                this.player.velocityY = 0;
             }
         }
 
@@ -61,6 +86,9 @@ const gameScreen = {
         ctx.translate(0, -camera.y);
 
         this.level.draw(ctx);
+        if (this.level.enemies) {
+            this.level.enemies.forEach(enemy => enemy.draw(ctx));
+        }
         this.player.draw(ctx);
 
         ctx.restore();
@@ -70,6 +98,7 @@ const gameScreen = {
         ctx.font = '24px Arial';
         ctx.textAlign = 'left';
         ctx.fillText(`Coins: ${this.coinsCollected} / ${this.level.totalCoins}`, 20, 40);
+        ctx.fillText(`Lives: ${this.player.lives}`, 20, 80);
 
         if (this.messageTimer > 0) {
             ctx.textAlign = 'center';

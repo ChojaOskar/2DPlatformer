@@ -8,7 +8,7 @@ const levelCompleteScreen = {
         window.removeEventListener("keydown", this.keyDownHandler);
     },
     update: function() {
-        // No update logic needed
+        
     },
     draw: function(ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);

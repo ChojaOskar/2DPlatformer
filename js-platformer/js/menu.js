@@ -73,7 +73,7 @@ const menuScreen = {
             case "Reset Progress":
                 progressManager.resetProgress();
                 this.message = "Progress has been reset!";
-                this.messageTimer = 120; // Show for 2 seconds
+                this.messageTimer = 120; 
                 break;
         }
     }

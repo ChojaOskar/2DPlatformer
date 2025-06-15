@@ -6,34 +6,56 @@ class Player {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.width = 32;
-        this.height = 32;
+        this.width = 40;
+        this.height = 40;
         this.velocityX = 0;
         this.velocityY = 0;
         this.onGround = false;
+        this.lives = 3;
+        this.respawnPoint = { x: x, y: y };
+        this.isInvincible = false;
+        this.invincibilityTimer = 0;
     }
 
     update(level) {
-        // Horizontal movement and collision
-        this.x += this.velocityX;
-        const collisionResultX = this.checkCollisions(level, 'x');
+        // 1. Handle invincibility state
+        if (this.isInvincible) {
+            this.invincibilityTimer--;
+            if (this.invincibilityTimer <= 0) {
+                this.isInvincible = false;
+            }
+        }
 
-        // Vertical movement and collision
+        // 2. Apply forces (input from game.js, gravity here)
         this.velocityY += GRAVITY;
-        this.y += this.velocityY;
-        this.onGround = false;
-        const collisionResultY = this.checkCollisions(level, 'y');
 
-        if (collisionResultX === 'coin_collected' || collisionResultY === 'coin_collected') {
-            return 'coin_collected';
-        }
-        if (collisionResultX === 'goal_reached' || collisionResultY === 'goal_reached') {
-            return 'goal_reached';
-        }
+        // 3. Move and resolve collisions with solid tiles
+        this.x += this.velocityX;
+        this.checkTileCollisions(level, 'x');
+
+        this.y += this.velocityY;
+        this.onGround = false; // Reset onGround status each frame
+        this.checkTileCollisions(level, 'y');
+
+        // 4. Check for other interactions
+        this.checkTrampolineCollision(level);
+        const enemyStatus = this.checkEnemyCollision(level);
+        if (enemyStatus) return enemyStatus;
+
+        if (this.checkCoinCollision(level)) return 'coin_collected';
+        if (this.checkGoalCollision(level)) return 'goal_reached';
+
+        return null;
     }
 
     draw(ctx) {
-        ctx.fillStyle = 'red';
+        if (this.isInvincible) {
+            // Flash every 4 frames for a blinking effect
+            if (Math.floor(this.invincibilityTimer / 4) % 2 === 0) {
+                return; 
+            }
+        }
+        ctx.fillStyle = 'orange';
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 
@@ -43,47 +65,114 @@ class Player {
         }
     }
 
-    checkCollisions(level, axis) {
+    checkEnemyCollision(level) {
+        const enemies = level.enemies || [];
+        for (let i = 0; i < enemies.length; i++) {
+            const enemy = enemies[i];
+            if (enemy.alive && this.isCollidingWith(enemy)) {
+                const previousPlayerBottom = (this.y - this.velocityY) + this.height;
+                // Stomp condition: falling, and was above the enemy in the previous frame.
+                if (this.velocityY > 0 && previousPlayerBottom <= enemy.y + 1) {
+                    enemy.kill();
+                    this.velocityY = -JUMP_FORCE / 2; 
+                    this.isInvincible = true;
+                    this.invincibilityTimer = 15; 
+                    return 'enemy_killed';
+                } else if (!this.isInvincible) {
+                    return 'enemy_collision';
+                }
+            }
+        }
+        return null;
+    }
+
+    isCollidingWith(other) {
+        return (
+            this.x < other.x + other.width &&
+            this.x + this.width > other.x &&
+            this.y < other.y + other.height &&
+            this.y + this.height > other.y
+        );
+    }
+
+    checkTileCollisions(level, axis) {
         const tileSize = level.tileSize;
-        const tiles = level.tiles;
-
-        for (let r = 0; r < tiles.length; r++) {
-            for (let c = 0; c < tiles[r].length; c++) {
-                const tileValue = tiles[r][c];
-                if (tileValue === 0) continue;
-
-                const tile = { x: c * tileSize, y: r * tileSize, width: tileSize, height: tileSize };
-
-                if (this.x < tile.x + tile.width &&
-                    this.x + this.width > tile.x &&
-                    this.y < tile.y + tile.height &&
-                    this.y + this.height > tile.y) {
-
-                    if (tileValue === 1) { // Solid tile
+        for (let r = 0; r < level.tiles.length; r++) {
+            for (let c = 0; c < level.tiles[r].length; c++) {
+                if (level.tiles[r][c] === 1) { // 1 is a solid tile
+                    const tile = { x: c * tileSize, y: r * tileSize, width: tileSize, height: tileSize };
+                    if (this.isCollidingWith(tile)) {
                         if (axis === 'x') {
-                            if (this.velocityX > 0) { // Moving right
+                            if (this.velocityX > 0) {
                                 this.x = tile.x - this.width;
-                            } else if (this.velocityX < 0) { // Moving left
+                            } else if (this.velocityX < 0) {
                                 this.x = tile.x + tile.width;
                             }
+                            this.velocityX = 0;
                         } else if (axis === 'y') {
-                            if (this.velocityY > 0) { // Moving down
+                            if (this.velocityY > 0) {
                                 this.y = tile.y - this.height;
-                                this.velocityY = 0;
                                 this.onGround = true;
-                            } else if (this.velocityY < 0) { // Moving up
+                            } else if (this.velocityY < 0) {
                                 this.y = tile.y + tile.height;
-                                this.velocityY = 0;
                             }
+                            this.velocityY = 0;
                         }
-                    } else if (tileValue === 2) { // Goal tile
-                        return 'goal_reached';
-                    } else if (tileValue === 3) { // Coin tile
-                        level.tiles[r][c] = 0; // Remove coin
-                        return 'coin_collected';
                     }
                 }
             }
         }
+    }
+
+    checkCoinCollision(level) {
+        const tileSize = level.tileSize;
+        for (let r = 0; r < level.tiles.length; r++) {
+            for (let c = 0; c < level.tiles[r].length; c++) {
+                if (level.tiles[r][c] === 3) { // 3 is a coin
+                    const coin = { x: c * tileSize, y: r * tileSize, width: tileSize, height: tileSize };
+                    if (this.isCollidingWith(coin)) {
+                        level.tiles[r][c] = 0; 
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    checkGoalCollision(level) {
+        const tileSize = level.tileSize;
+        for (let r = 0; r < level.tiles.length; r++) {
+            for (let c = 0; c < level.tiles[r].length; c++) {
+                if (level.tiles[r][c] === 2) { // 2 is the goal
+                    const goal = { x: c * tileSize, y: r * tileSize, width: tileSize, height: tileSize };
+                    if (this.isCollidingWith(goal)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    checkTrampolineCollision(level) {
+        const tileSize = level.tileSize;
+        for (let r = 0; r < level.tiles.length; r++) {
+            for (let c = 0; c < level.tiles[r].length; c++) {
+                if (level.tiles[r][c] === 5) { // 5 is a trampoline
+                    const trampoline = { x: c * tileSize, y: r * tileSize, width: tileSize, height: tileSize };
+                    if (this.isCollidingWith(trampoline)) {
+                        const previousPlayerBottom = (this.y - this.velocityY) + this.height;
+                        
+                        if (this.velocityY > 0 && previousPlayerBottom <= trampoline.y + 1) {
+                            this.y = trampoline.y - this.height; 
+                            this.velocityY = JUMP_FORCE * 1.9; 
+                            return true; 
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

@@ -1,16 +1,15 @@
 const progressManager = {
-    progress: { completedLevels: [] }, // Default progress
+    progress: { completedLevels: [] }, 
 
     loadProgress: function() {
         const progressData = localStorage.getItem('playerProgress');
         if (progressData) {
             this.progress = JSON.parse(progressData);
-            // Ensure completedLevels is an array, for safety with old data
+            
             if (!Array.isArray(this.progress.completedLevels)) {
                 this.progress.completedLevels = [];
             }
         } else {
-            // If no progress is saved, use the default and save it.
             this.saveProgress();
         }
         console.log("Progress loaded:", this.progress);
@@ -44,7 +43,7 @@ const progressManager = {
         return this.progress.completedLevels.length === LEVELS.length;
     },
 
-    // A function to reset progress for testing
+    
     resetProgress: function() {
         this.progress.completedLevels = [];
         this.saveProgress();
