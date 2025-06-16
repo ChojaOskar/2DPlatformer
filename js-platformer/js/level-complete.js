@@ -30,6 +30,7 @@ const levelCompleteScreen = {
                 switchScreen(winScreen);
             } else {
                 console.log("Attempting to switch to level select screen...");
+                menuMusic.play();
                 switchScreen(levelSelectScreen);
             }
         }

@@ -73,7 +73,7 @@ class Player {
         ctx.save();
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.rotate(this.angle * Math.PI / 180);
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = 'orange';
         ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
         ctx.restore();
     }

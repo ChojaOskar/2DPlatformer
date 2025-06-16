@@ -26,6 +26,7 @@ const winScreen = {
     handleKeyDown: function(e) {
         if (e.key === "Enter") {
             this.exit();
+            menuMusic.play();
             switchScreen(menuScreen);
         }
     }
