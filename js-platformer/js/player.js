@@ -3,7 +3,7 @@ const JUMP_FORCE = -8;
 const MOVE_SPEED = 2;
 
 class Player {
-    constructor(x, y) {
+    constructor(x, y, jumpSound) {
         this.x = x;
         this.y = y;
         this.width = 40;
@@ -15,6 +15,7 @@ class Player {
         this.respawnPoint = { x: x, y: y };
         this.isInvincible = false;
         this.invincibilityTimer = 0;
+        this.jumpSound = jumpSound;
     }
 
     update(level) {
@@ -62,6 +63,10 @@ class Player {
     jump() {
         if (this.onGround) {
             this.velocityY = JUMP_FORCE;
+            if (this.jumpSound) {
+                this.jumpSound.currentTime = 0;
+                this.jumpSound.play();
+            }
         }
     }
 

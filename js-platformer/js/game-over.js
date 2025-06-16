@@ -1,11 +1,14 @@
 const gameOverScreen = {
     enter: function() {
+        gameOverSound.play();
         progressManager.resetProgress();
         console.log("Entered game over screen and reset progress.");
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
     exit: function() {
+        gameOverSound.pause();
+        gameOverSound.currentTime = 0;
         window.removeEventListener("keydown", this.keyDownHandler);
     },
     update: function() {

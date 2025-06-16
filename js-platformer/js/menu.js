@@ -1,5 +1,6 @@
 const menuScreen = {
     enter: function() {
+        menuMusic.play();
         console.log("Entered menu screen.");
         this.menuText = "JS Platformer";
         this.options = ["Start Game", "Select Level", "Level Editor", "Reset Progress"];
@@ -9,8 +10,11 @@ const menuScreen = {
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
-    exit: function() {
+    exit: function(nextScreen) {
         console.log("Exiting menu screen.");
+        if (nextScreen !== levelSelectScreen) {
+            menuMusic.pause();
+        }
         window.removeEventListener("keydown", this.keyDownHandler);
     },
     update: function() {
@@ -55,19 +59,20 @@ const menuScreen = {
     },
     selectOption: function() {
         const option = this.options[this.selectedOption];
-        if (option !== "Reset Progress") {
-            this.exit();
-        }
+        
 
         switch (option) {
             case "Start Game":
+                this.exit(gameScreen);
                 gameScreen.setLevel(LEVELS[0], 0);
                 switchScreen(gameScreen);
                 break;
             case "Select Level":
+                this.exit(levelSelectScreen);
                 switchScreen(levelSelectScreen);
                 break;
             case "Level Editor":
+                this.exit(editorScreen);
                 switchScreen(editorScreen);
                 break;
             case "Reset Progress":

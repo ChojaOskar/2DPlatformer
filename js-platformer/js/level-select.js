@@ -1,13 +1,17 @@
 const levelSelectScreen = {
     enter: function() {
+        menuMusic.play();
         console.log("Successfully entered level select screen.");
         this.selectedLevel = 0;
         progressManager.loadProgress(); 
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
-    exit: function() {
+    exit: function(nextScreen) {
         console.log("Exiting level select screen.");
+        if (nextScreen !== menuScreen) {
+            menuMusic.pause();
+        }
         window.removeEventListener("keydown", this.keyDownHandler);
     },
     update: function() {
@@ -49,12 +53,12 @@ const levelSelectScreen = {
                 this.selectLevel();
             }
         } else if (e.key === "Escape") {
-            this.exit();
+            this.exit(menuScreen);
             switchScreen(menuScreen);
         }
     },
     selectLevel: function() {
-        this.exit();
+        this.exit(gameScreen);
         gameScreen.setLevel(LEVELS[this.selectedLevel], this.selectedLevel);
         switchScreen(gameScreen);
     }
