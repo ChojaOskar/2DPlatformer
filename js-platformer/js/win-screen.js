@@ -1,10 +1,14 @@
 const winScreen = {
     enter: function() {
+        levelMusic.pause();
+        levelCompleteSound.currentTime = 0;
+        levelCompleteSound.play();
         console.log("Entered win screen.");
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
     exit: function() {
+        levelCompleteSound.pause();
         window.removeEventListener("keydown", this.keyDownHandler);
     },
     update: function() {

@@ -16,6 +16,7 @@ class Player {
         this.isInvincible = false;
         this.invincibilityTimer = 0;
         this.jumpSound = jumpSound;
+        this.angle = 0;
     }
 
     update(level) {
@@ -46,6 +47,19 @@ class Player {
         if (this.checkCoinCollision(level)) return 'coin_collected';
         if (this.checkGoalCollision(level)) return 'goal_reached';
 
+        if (this.onGround) {
+            this.angle = 0;
+        } else {
+            const rotationSpeed = 5;
+            if (this.velocityX > 0) {
+                this.angle += rotationSpeed; // Spin right
+            } else if (this.velocityX < 0) {
+                this.angle -= rotationSpeed; // Spin left
+            } else {
+                this.angle += rotationSpeed; // Default spin for vertical jump
+            }
+        }
+
         return null;
     }
 
@@ -56,8 +70,12 @@ class Player {
                 return; 
             }
         }
-        ctx.fillStyle = 'orange';
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.save();
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+        ctx.rotate(this.angle * Math.PI / 180);
+        ctx.fillStyle = 'red';
+        ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.restore();
     }
 
     jump() {

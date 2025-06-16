@@ -50,7 +50,9 @@ class Level {
                     ctx.fillRect(c * this.tileSize, r * this.tileSize, this.tileSize, this.tileSize);
                 } else if (tile === 3) { // Coin tile
                     ctx.fillStyle = 'yellow';
-                    ctx.fillRect(c * this.tileSize, r * this.tileSize, this.tileSize, this.tileSize);
+                    ctx.beginPath();
+                    ctx.ellipse(c * this.tileSize + this.tileSize / 2, r * this.tileSize + this.tileSize / 2, this.tileSize / 4, this.tileSize / 2, 0, 0, 2 * Math.PI);
+                    ctx.fill();
                 } else if (tile === 5) { // Trampoline tile
                     ctx.fillStyle = 'purple';
                     ctx.fillRect(c * this.tileSize, r * this.tileSize, this.tileSize, this.tileSize);

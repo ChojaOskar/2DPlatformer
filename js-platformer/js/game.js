@@ -46,6 +46,8 @@ const gameScreen = {
             this.level.enemies.forEach(enemy => enemy.update(this.level));
         }
 
+        
+
         if (playerStatus === 'coin_collected') {
             coinSound.currentTime = 0;
             coinSound.play();
@@ -97,6 +99,8 @@ const gameScreen = {
         if (this.level.enemies) {
             this.level.enemies.forEach(enemy => enemy.draw(ctx));
         }
+
+        
         this.player.draw(ctx);
 
         ctx.restore();

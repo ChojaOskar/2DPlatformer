@@ -5,3 +5,4 @@ const levelMusic = new Audio('assets/01. Birabuto Kingdom.mp3');
 levelMusic.loop = true;
 const lostALifeSound = new Audio('assets/LostALife.mp3');
 const coinSound = new Audio('assets/super-mario-coin-sound.mp3');
+const levelCompleteSound = new Audio('assets/06. Level Complete.mp3');

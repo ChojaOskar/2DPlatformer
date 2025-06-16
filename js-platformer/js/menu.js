@@ -2,11 +2,13 @@ const menuScreen = {
     enter: function() {
         menuMusic.play();
         console.log("Entered menu screen.");
-        this.menuText = "JS Platformer";
+        this.menuText = "Block Adventure";
         this.options = ["Start Game", "Select Level", "Level Editor", "Reset Progress"];
         this.selectedOption = 0;
         this.message = '';
         this.messageTimer = 0;
+        this.backgroundImage = new Image();
+        this.backgroundImage.src = 'assets/background.png';
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
@@ -26,7 +28,12 @@ const menuScreen = {
         }
     },
     draw: function(ctx) {
-        ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        if (this.backgroundImage.complete) {
+            ctx.drawImage(this.backgroundImage, 0, 0, GAME_WIDTH, GAME_HEIGHT);
+        } else {
+            ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        }
+
         ctx.fillStyle = 'white';
         ctx.textAlign = 'center';
         ctx.font = '50px Arial';
