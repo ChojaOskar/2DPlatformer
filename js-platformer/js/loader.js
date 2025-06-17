@@ -20,7 +20,7 @@ const resourceManager = {
     },
     loadAll: async function() {
         console.log("Loading all resources...");
-        const [background, menuMusic, jumpSound, coinSound, levelCompleteMusic, gameOverMusic, lifeLostSound, levelMusic] = await Promise.all([
+        const [background, menuMusic, jumpSound, coinSound, levelCompleteMusic, gameOverMusic, lifeLostSound, levelMusic, editorMusic] = await Promise.all([
             this.loadImage('assets/background.png'),
             this.loadAudio('assets/08. Main Menu (Medley).mp3'),
             this.loadAudio('assets/maro-jump-sound-effect_1.mp3'),
@@ -28,7 +28,8 @@ const resourceManager = {
             this.loadAudio('assets/06. Level Complete.mp3'),
             this.loadAudio('assets/GameOver.mp3'),
             this.loadAudio('assets/LostALife.mp3'),
-            this.loadAudio('assets/01. Birabuto Kingdom.mp3')
+            this.loadAudio('assets/01. Birabuto Kingdom.mp3'),
+            this.loadAudio('assets/editor.mp3')
         ]);
 
         window.backgroundImage = background;
@@ -39,6 +40,7 @@ const resourceManager = {
         window.gameOverMusic = gameOverMusic;
         window.lifeLostSound = lifeLostSound;
         window.levelMusic = levelMusic;
+        window.editorMusic = editorMusic;
 
         console.log("All resources loaded.");
     }

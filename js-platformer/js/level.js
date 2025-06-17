@@ -8,7 +8,17 @@ class Level {
         let tileData;
         if (levelData) {
             if (Array.isArray(levelData)) { // For backward compatibility with old level format
-                tileData = levelData;
+                // Create a deep copy immediately to avoid modifying the original LEVEL array
+                tileData = levelData.map(row => [...row]);
+                // Scan for player start in the copy
+                for (let r = 0; r < tileData.length; r++) {
+                    for (let c = 0; c < tileData[r].length; c++) {
+                        if (tileData[r][c] === 7) {
+                            this.playerStart = { x: c, y: r };
+                            tileData[r][c] = 0; // Remove the tile from the copy, not the original
+                        }
+                    }
+                }
             } else { // New format: { tiles: [...], playerStart: {x, y} }
                 tileData = levelData.tiles;
                 if (levelData.playerStart) {

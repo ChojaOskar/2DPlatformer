@@ -1,5 +1,11 @@
 const editorScreen = {
     enter: function() {
+        if (window.menuMusic) window.menuMusic.pause(); // Stop menu music
+        if (window.editorMusic) {
+            window.editorMusic.currentTime = 0;
+            window.editorMusic.loop = true;
+            window.editorMusic.play();
+        }
         this.mode = 'menu'; // 'menu', 'editing', 'naming', or 'confirmingDelete'
         this.customLevels = JSON.parse(localStorage.getItem('customLevels')) || {};
         this.levelNames = Object.keys(this.customLevels);
@@ -12,6 +18,7 @@ const editorScreen = {
         window.addEventListener("keydown", this.keyDownHandler);
     },
     exit: function() {
+        if (window.editorMusic) window.editorMusic.pause();
         console.log("Exiting editor screen.");
         window.removeEventListener("keydown", this.keyDownHandler);
     },
