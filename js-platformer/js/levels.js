@@ -1,3 +1,16 @@
+/**
+ * @file Contains the tile data for all predefined game levels.
+ * 
+ * Each level is a 2D array representing the tile map.
+ * The numbers in the array correspond to different tile types:
+ * 0: Empty space
+ * 1: Solid block
+ * 2: Goal
+ * 3: Coin
+ * 4: Enemy
+ * 5: Trampoline
+ * 7: Player start position
+ */
 const LEVELS = [
     // Level 1 (30 rows high)
     [

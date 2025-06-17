@@ -1,8 +1,20 @@
+/**
+ * @file Defines the Player class, which controls the player character's behavior.
+ */
+
 const GRAVITY = 0.2;
 const JUMP_FORCE = -8;
 const MOVE_SPEED = 2;
 
+/**
+ * Represents the player character.
+ */
 class Player {
+    /**
+     * Creates a new Player instance.
+     * @param {number} x - The initial x-coordinate of the player.
+     * @param {number} y - The initial y-coordinate of the player.
+     */
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -18,6 +30,11 @@ class Player {
         this.angle = 0;
     }
 
+    /**
+     * Updates the player's state for the current frame.
+     * @param {Level} level - The current level object.
+     * @returns {string|null} A string indicating the player's status (e.g., 'coin_collected'), or null.
+     */
     update(level) {
         // 1. Handle invincibility state
         if (this.isInvincible) {
@@ -62,6 +79,10 @@ class Player {
         return null;
     }
 
+    /**
+     * Draws the player on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     draw(ctx) {
         if (this.isInvincible) {
             // Flash every 4 frames for a blinking effect
@@ -77,6 +98,9 @@ class Player {
         ctx.restore();
     }
 
+    /**
+     * Makes the player jump if they are on the ground.
+     */
     jump() {
         if (this.onGround) {
             this.velocityY = JUMP_FORCE;
@@ -87,6 +111,11 @@ class Player {
         }
     }
 
+    /**
+     * Checks for and handles collisions with enemies.
+     * @param {Level} level - The current level object.
+     * @returns {string|null} 'enemy_killed' or 'enemy_collision', or null if no collision.
+     */
     checkEnemyCollision(level) {
         const enemies = level.enemies || [];
         for (let i = 0; i < enemies.length; i++) {
@@ -108,6 +137,11 @@ class Player {
         return null;
     }
 
+    /**
+     * AABB collision detection.
+     * @param {object} other - The other object to check collision with (must have x, y, width, height).
+     * @returns {boolean} True if colliding, false otherwise.
+     */
     isCollidingWith(other) {
         return (
             this.x < other.x + other.width &&
@@ -117,6 +151,11 @@ class Player {
         );
     }
 
+    /**
+     * Checks for and resolves collisions with solid tiles on a given axis.
+     * @param {Level} level - The current level object.
+     * @param {string} axis - The axis to check ('x' or 'y').
+     */
     checkTileCollisions(level, axis) {
         const tileSize = level.tileSize;
         for (let r = 0; r < level.tiles.length; r++) {
@@ -146,6 +185,11 @@ class Player {
         }
     }
 
+    /**
+     * Checks for collisions with coins.
+     * @param {Level} level - The current level object.
+     * @returns {boolean} True if a coin was collected, false otherwise.
+     */
     checkCoinCollision(level) {
         const tileSize = level.tileSize;
         for (let r = 0; r < level.tiles.length; r++) {
@@ -162,6 +206,11 @@ class Player {
         return false;
     }
 
+    /**
+     * Checks for collision with the goal tile.
+     * @param {Level} level - The current level object.
+     * @returns {boolean} True if the goal was reached, false otherwise.
+     */
     checkGoalCollision(level) {
         const tileSize = level.tileSize;
         for (let r = 0; r < level.tiles.length; r++) {
@@ -177,6 +226,11 @@ class Player {
         return false;
     }
 
+    /**
+     * Checks for and handles collisions with trampolines.
+     * @param {Level} level - The current level object.
+     * @returns {boolean} True if a trampoline was used, false otherwise.
+     */
     checkTrampolineCollision(level) {
         const tileSize = level.tileSize;
         for (let r = 0; r < level.tiles.length; r++) {

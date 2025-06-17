@@ -1,4 +1,15 @@
+/**
+ * @file Defines the Level class, which represents a single game level.
+ */
+
+/**
+ * Represents a game level, containing the tile map, enemies, and player start position.
+ */
 class Level {
+    /**
+     * Creates a new Level instance.
+     * @param {object | Array<Array<number>>} levelData - The data for the level. Can be an object `{tiles, playerStart}` or a 2D array for backward compatibility.
+     */
     constructor(levelData) {
         this.tileSize = 40;
         this.totalCoins = 0;
@@ -58,6 +69,11 @@ class Level {
         }
     }
 
+    /**
+     * Draws the level's tiles on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     * @param {boolean} [isEditor=false] - If true, draws placeholders for things like enemies.
+     */
     draw(ctx, isEditor = false) {
         for (let r = 0; r < this.tiles.length; r++) {
             for (let c = 0; c < this.tiles[r].length; c++) {

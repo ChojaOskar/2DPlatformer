@@ -1,4 +1,15 @@
+/**
+ * @file Defines the level complete screen, shown after successfully finishing a level.
+ */
+
+/**
+ * The level complete screen object. Handles displaying a success message and transitioning to the next screen.
+ * @namespace levelCompleteScreen
+ */
 const levelCompleteScreen = {
+    /**
+     * Initializes the level complete screen. Plays music and sets up input handling.
+     */
     enter: function() {
         window.levelMusic.pause();
         window.levelCompleteMusic.currentTime = 0;
@@ -7,13 +18,23 @@ const levelCompleteScreen = {
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
+    /**
+     * Cleans up the level complete screen. Stops music and removes the input listener.
+     */
     exit: function() {
         window.levelCompleteMusic.pause();
         window.removeEventListener("keydown", this.keyDownHandler);
     },
+    /**
+     * Updates the level complete screen state. This screen has no dynamic updates.
+     */
     update: function() {
         
     },
+    /**
+     * Draws the level complete screen on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     draw: function(ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         ctx.fillStyle = 'white';
@@ -23,6 +44,10 @@ const levelCompleteScreen = {
         ctx.font = '30px Arial';
         ctx.fillText("Press Enter to continue", GAME_WIDTH / 2, 300);
     },
+    /**
+     * Handles keydown events to proceed to the next level or the win screen.
+     * @param {KeyboardEvent} e - The keyboard event.
+     */
     handleKeyDown: function(e) {
         if (e.key === "Enter") {
             this.exit();

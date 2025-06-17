@@ -1,4 +1,15 @@
+/**
+ * @file Defines the level selection screen for the game.
+ */
+
+/**
+ * The level selection screen object. Handles displaying both predefined and custom levels.
+ * @namespace levelSelectScreen
+ */
 const levelSelectScreen = {
+    /**
+     * Initializes the level select screen. It loads both predefined and custom levels.
+     */
     enter: function() {
         menuMusic.play();
         console.log("Entered level select screen.");
@@ -9,6 +20,11 @@ const levelSelectScreen = {
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
+
+    /**
+     * Cleans up the level select screen. Called when switching away from this screen.
+     * @param {object} nextScreen - The screen being switched to.
+     */
     exit: function(nextScreen) {
         console.log("Exiting level select screen.");
         if (nextScreen !== menuScreen) {
@@ -16,9 +32,18 @@ const levelSelectScreen = {
         }
         window.removeEventListener("keydown", this.keyDownHandler);
     },
+
+    /**
+     * Updates the level select screen state. Called on every frame. (Currently empty)
+     */
     update: function() {
         
     },
+
+    /**
+     * Draws the level select screen on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     draw: function(ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         ctx.fillStyle = 'white';
@@ -44,6 +69,11 @@ const levelSelectScreen = {
             ctx.fillText(fullText, GAME_WIDTH / 2, 200 + i * 50);
         }
     },
+
+    /**
+     * Handles keydown events for level selection navigation.
+     * @param {KeyboardEvent} e - The keyboard event.
+     */
     handleKeyDown: function(e) {
         if (e.key === "ArrowDown") {
             this.selectedLevel = (this.selectedLevel + 1) % this.levelNames.length;
@@ -59,6 +89,10 @@ const levelSelectScreen = {
             switchScreen(menuScreen);
         }
     },
+
+    /**
+     * Starts the selected level.
+     */
     selectLevel: function() {
         this.exit(gameScreen);
         gameScreen.setLevel(this.levels[this.selectedLevel], this.selectedLevel);

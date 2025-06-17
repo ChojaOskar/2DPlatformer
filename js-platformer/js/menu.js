@@ -1,4 +1,15 @@
+/**
+ * @file Defines the main menu screen for the game.
+ */
+
+/**
+ * The main menu screen object. Handles displaying menu options and user input.
+ * @namespace menuScreen
+ */
 const menuScreen = {
+    /**
+     * Initializes the menu screen. Called when switching to this screen.
+     */
     enter: function() {
         window.menuMusic.play();
         console.log("Entered menu screen.");
@@ -11,6 +22,11 @@ const menuScreen = {
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
+
+    /**
+     * Cleans up the menu screen. Called when switching away from this screen.
+     * @param {object} nextScreen - The screen being switched to.
+     */
     exit: function(nextScreen) {
         console.log("Exiting menu screen.");
         if (nextScreen !== levelSelectScreen) {
@@ -18,6 +34,10 @@ const menuScreen = {
         }
         window.removeEventListener("keydown", this.keyDownHandler);
     },
+
+    /**
+     * Updates the menu screen state. Called on every frame.
+     */
     update: function() {
         if (this.messageTimer > 0) {
             this.messageTimer--;
@@ -26,6 +46,11 @@ const menuScreen = {
             }
         }
     },
+
+    /**
+     * Draws the menu screen on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     draw: function(ctx) {
         if (this.backgroundImage.complete) {
             ctx.drawImage(this.backgroundImage, 0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -54,6 +79,11 @@ const menuScreen = {
             ctx.fillText(this.message, GAME_WIDTH / 2, GAME_HEIGHT - 50);
         }
     },
+
+    /**
+     * Handles keydown events for menu navigation.
+     * @param {KeyboardEvent} e - The keyboard event.
+     */
     handleKeyDown: function(e) {
         if (e.key === "ArrowDown") {
             this.selectedOption = (this.selectedOption + 1) % this.options.length;
@@ -63,6 +93,10 @@ const menuScreen = {
             this.selectOption();
         }
     },
+
+    /**
+     * Executes the action for the currently selected menu option.
+     */
     selectOption: function() {
         const option = this.options[this.selectedOption];
         

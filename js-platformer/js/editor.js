@@ -1,4 +1,56 @@
+/**
+ * @file Defines the level editor screen, allowing users to create, edit, and delete custom levels.
+ */
+
+/**
+ * The editor screen object. Manages all functionality of the level editor.
+ * @namespace editorScreen
+ */
 const editorScreen = {
+    /**
+     * The current mode of the editor. Can be 'menu', 'editing', 'naming', or 'confirmingDelete'.
+     * @type {string}
+     */
+    mode: 'menu',
+    /**
+     * An object containing all custom levels, loaded from localStorage.
+     * @type {Object.<string, object>}
+     */
+    customLevels: {},
+    /**
+     * An array of names for the custom levels.
+     * @type {string[]}
+     */
+    levelNames: [],
+    /**
+     * The index of the currently selected level in the menu.
+     * @type {number}
+     */
+    selectedLevelIndex: 0,
+    /**
+     * The tile type currently selected in the palette.
+     * @type {number}
+     */
+    selectedTile: 1,
+    /**
+     * The cursor position in the editor grid.
+     * @type {{x: number, y: number}}
+     */
+    cursor: { x: 0, y: 0 },
+    /**
+     * The name for a new level being created.
+     * @type {string}
+     */
+    newLevelName: '',
+    /**
+     * The current level object being edited.
+     * @type {Level|null}
+     */
+    level: null,
+
+    /**
+     * Initializes the editor screen. Loads custom levels, sets up music, and adds input listeners.
+     */
     enter: function() {
         if (window.menuMusic) window.menuMusic.pause(); // Stop menu music
         if (window.editorMusic) {
@@ -17,14 +69,24 @@ const editorScreen = {
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
+    /**
+     * Cleans up the editor screen. Stops music and removes input listeners.
+     */
     exit: function() {
         if (window.editorMusic) window.editorMusic.pause();
         console.log("Exiting editor screen.");
         window.removeEventListener("keydown", this.keyDownHandler);
     },
+    /**
+     * Updates the editor state. Currently unused.
+     */
     update: function() {
 
     },
+    /**
+     * The main drawing function for the editor. Delegates to other draw functions based on the current mode.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     draw: function(ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         if (this.mode === 'menu') {
@@ -41,6 +103,10 @@ const editorScreen = {
             this.drawDeleteConfirmationScreen(ctx);
         }
     },
+    /**
+     * Draws the level selection menu.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     drawMenu: function(ctx) {
         ctx.fillStyle = 'white';
         ctx.textAlign = 'center';
@@ -60,6 +126,10 @@ const editorScreen = {
         ctx.fillStyle = 'white';
         ctx.fillText('Press Enter to select, D to delete, Esc to go back', GAME_WIDTH / 2, GAME_HEIGHT - 50);
     },
+    /**
+     * Draws a grid overlay on the editor canvas.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     drawGrid: function(ctx) {
         ctx.strokeStyle = '#555';
         for (let x = 0; x < GAME_WIDTH; x += this.level.tileSize) {
@@ -75,6 +145,10 @@ const editorScreen = {
             ctx.stroke();
         }
     },
+    /**
+     * Draws the tile palette at the bottom of the screen.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     drawTilePalette: function(ctx) {
         const TILE_TYPES = [1, 2, 3, 4, 5, 7, 0]; // Wall, Goal, Coin, Enemy, Trampoline, Player, Erase
         ctx.fillStyle = 'gray';
@@ -91,6 +165,14 @@ const editorScreen = {
             this.drawTile(ctx, tile, x, y, 40);
         }
     },
+    /**
+     * Draws a single tile with its label in the palette.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     * @param {number} tile - The tile type to draw.
+     * @param {number} x - The x-coordinate to draw at.
+     * @param {number} y - The y-coordinate to draw at.
+     * @param {number} size - The size of the tile.
+     */
     drawTile: function(ctx, tile, x, y, size) {
         ctx.fillStyle = 'white';
         ctx.font = '12px Arial';
@@ -104,6 +186,10 @@ const editorScreen = {
             case 0: ctx.fillStyle = 'black'; ctx.fillRect(x, y-20, size, size); ctx.fillText('Erase', x, y + 30); break;
         }
     },
+    /**
+     * The main keydown handler, which delegates to other handlers based on the current editor mode.
+     * @param {KeyboardEvent} e - The keyboard event.
+     */
     handleKeyDown: function(e) {
         if (this.mode === 'menu') {
             switch (e.key) {
@@ -135,6 +221,10 @@ const editorScreen = {
             this.handleDeleteConfirmationKeyDown(e);
         }
     },
+    /**
+     * Handles keyboard input when in 'editing' mode for placing tiles, moving the cursor, and changing tile types.
+     * @param {KeyboardEvent} e - The keyboard event.
+     */
     handleEditorKeyDown: function(e) {
         switch (e.key) {
             case 'ArrowUp':
@@ -179,6 +269,10 @@ const editorScreen = {
                 break;
         }
     },
+    /**
+     * Draws the editor cursor on the grid.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     drawCursor: function(ctx) {
         const tileSize = this.level.tileSize;
         const x = this.cursor.x * tileSize;
@@ -192,6 +286,9 @@ const editorScreen = {
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, tileSize, tileSize);
     },
+    /**
+     * Handles the selection of a level from the menu, either creating a new one or loading an existing one.
+     */
     selectLevel: function() {
         if (this.selectedLevelIndex === 0) { // Corresponds to 'Create New Level'
             this.mode = 'naming';
@@ -205,6 +302,10 @@ const editorScreen = {
         }
     },
 
+    /**
+     * Draws the screen for naming a new level.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     drawNamingScreen: function(ctx) {
         // Draw a semi-transparent background
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -225,6 +326,10 @@ const editorScreen = {
         ctx.fillText('Press Enter to confirm, Escape to cancel.', GAME_WIDTH / 2, 350);
     },
 
+    /**
+     * Handles keyboard input for the level naming screen.
+     * @param {KeyboardEvent} e - The keyboard event.
+     */
     handleNamingKeyDown: function(e) {
         if (e.key === 'Enter') {
             if (this.newLevelName && !this.customLevels[this.newLevelName]) {
@@ -251,6 +356,10 @@ const editorScreen = {
             }
         }
     },
+    /**
+     * Draws the confirmation screen for deleting a level.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     drawDeleteConfirmationScreen: function(ctx) {
         // Draw semi-transparent background
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -268,6 +377,10 @@ const editorScreen = {
         ctx.fillText('Yes (Enter) / No (Escape)', GAME_WIDTH / 2, 320);
     },
 
+    /**
+     * Handles keyboard input for the delete confirmation screen.
+     * @param {KeyboardEvent} e - The keyboard event.
+     */
     handleDeleteConfirmationKeyDown: function(e) {
         if (e.key === 'Enter') {
             if (this.selectedLevelIndex > 0) {
@@ -284,9 +397,21 @@ const editorScreen = {
             this.mode = 'menu';
         }
     },
+    /**
+     * Saves the custom levels object to the browser's localStorage.
+     */
     saveCustomLevels: function() {
-        localStorage.setItem('customLevels', JSON.stringify(this.customLevels));
+        try {
+            localStorage.setItem('customLevels', JSON.stringify(this.customLevels));
+        } catch (e) {
+            console.error("Failed to save custom levels to localStorage:", e);
+            alert("Error: Could not save level. Your browser's storage may be full or disabled.");
+        }
     },
+    /**
+     * Creates a new, empty level data object.
+     * @returns {{tiles: Array<Array<number>>, playerStart: {x: number, y: number}}} A new level object.
+     */
     createEmptyLevel: function() {
         const rows = GAME_HEIGHT / 40;
         const cols = GAME_WIDTH / 40;
@@ -304,6 +429,10 @@ const editorScreen = {
 
 
 
+    /**
+     * Draws a visual marker for the player's starting position.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     drawPlayerStart: function(ctx) {
         if (this.level && this.level.playerStart) {
             const x = this.level.playerStart.x * this.level.tileSize;

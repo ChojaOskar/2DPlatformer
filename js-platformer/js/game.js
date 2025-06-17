@@ -1,7 +1,27 @@
+/**
+ * @file Defines the main game screen, where the actual gameplay happens.
+ */
+
+/**
+ * Holds the data for the level currently being played.
+ * @type {object | null}
+ */
 let currentLevelData = null;
+
+/**
+ * The 0-based index of the current level.
+ * @type {number}
+ */
 let currentLevelIndex = 0;
 
+/**
+ * The main game screen object. Manages the game state, player, level, and core game loop.
+ * @namespace gameScreen
+ */
 const gameScreen = {
+    /**
+     * Initializes the game screen. Sets up the level, player, camera, and input handlers.
+     */
     enter: function() {
         window.menuMusic.pause();
         window.levelMusic.play();
@@ -29,6 +49,10 @@ const gameScreen = {
         window.addEventListener("keydown", this.keyDownHandler);
         window.addEventListener("keyup", this.keyUpHandler);
     },
+
+    /**
+     * Cleans up the game screen. Called when switching away from this screen.
+     */
     exit: function() {
         window.levelMusic.pause();
         window.levelMusic.currentTime = 0;
@@ -37,6 +61,11 @@ const gameScreen = {
         window.removeEventListener("keyup", this.keyUpHandler);
         currentLevelData = null;
     },
+
+    /**
+     * Updates the game state. Called on every frame.
+     * Handles player updates, enemy updates, camera movement, and game logic.
+     */
     update: function() {
         this.handleInput();
         const playerStatus = this.player.update(this.level);
@@ -90,6 +119,11 @@ const gameScreen = {
             }
         }
     },
+
+    /**
+     * Draws the game screen on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The rendering context.
+     */
     draw: function(ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
@@ -118,6 +152,11 @@ const gameScreen = {
             ctx.fillText(this.message, GAME_WIDTH / 2, 80);
         }
     },
+
+    /**
+     * Handles keydown events for player actions and pausing.
+     * @param {KeyboardEvent} e - The keyboard event.
+     */
     handleKeyDown: function(e) {
         this.keys[e.key] = true;
         if (e.key === "Escape") {
@@ -125,13 +164,28 @@ const gameScreen = {
             switchScreen(menuScreen);
         }
     },
+
+    /**
+     * Handles keyup events to stop player movement.
+     * @param {KeyboardEvent} e - The keyboard event.
+     */
     handleKeyUp: function(e) {
         this.keys[e.key] = false;
     },
+
+    /**
+     * Sets the level data to be loaded when the screen is entered.
+     * @param {object} levelData - The raw level data object.
+     * @param {number} levelIndex - The 0-based index of the level.
+     */
     setLevel: function(levelData, levelIndex) {
         currentLevelData = levelData;
         currentLevelIndex = levelIndex;
     },
+
+    /**
+     * Processes the current keyboard state to move the player.
+     */
     handleInput: function() {
         this.player.velocityX = 0;
         if (this.keys['ArrowLeft']) {
@@ -144,6 +198,10 @@ const gameScreen = {
             this.player.jump();
         }
     },
+
+    /**
+     * Handles the logic for when a level is completed.
+     */
     levelComplete: function() {
         console.log(`Level ${currentLevelIndex + 1} complete!`);
         this.exit();
