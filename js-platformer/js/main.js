@@ -24,7 +24,8 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-window.onload = function() {
+window.onload = async function() {
+    await resourceManager.loadAll();
     progressManager.loadProgress();
     switchScreen(menuScreen);
     requestAnimationFrame(gameLoop);

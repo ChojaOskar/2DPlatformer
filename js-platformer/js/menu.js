@@ -1,21 +1,20 @@
 const menuScreen = {
     enter: function() {
-        menuMusic.play();
+        window.menuMusic.play();
         console.log("Entered menu screen.");
         this.menuText = "Block Adventure";
         this.options = ["Start Game", "Select Level", "Level Editor", "Reset Progress"];
         this.selectedOption = 0;
         this.message = '';
         this.messageTimer = 0;
-        this.backgroundImage = new Image();
-        this.backgroundImage.src = 'assets/background.png';
+        this.backgroundImage = window.backgroundImage;
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
     exit: function(nextScreen) {
         console.log("Exiting menu screen.");
         if (nextScreen !== levelSelectScreen) {
-            menuMusic.pause();
+            window.menuMusic.pause();
         }
         window.removeEventListener("keydown", this.keyDownHandler);
     },

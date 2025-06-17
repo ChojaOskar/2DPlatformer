@@ -1,14 +1,14 @@
 const levelCompleteScreen = {
     enter: function() {
-        levelMusic.pause();
-        levelCompleteSound.currentTime = 0;
-        levelCompleteSound.play();
+        window.levelMusic.pause();
+        window.levelCompleteMusic.currentTime = 0;
+        window.levelCompleteMusic.play();
         console.log("Entered level complete screen.");
         this.keyDownHandler = this.handleKeyDown.bind(this);
         window.addEventListener("keydown", this.keyDownHandler);
     },
     exit: function() {
-        levelCompleteSound.pause();
+        window.levelCompleteMusic.pause();
         window.removeEventListener("keydown", this.keyDownHandler);
     },
     update: function() {
@@ -30,7 +30,7 @@ const levelCompleteScreen = {
                 switchScreen(winScreen);
             } else {
                 console.log("Attempting to switch to level select screen...");
-                menuMusic.play();
+                window.menuMusic.play();
                 switchScreen(levelSelectScreen);
             }
         }

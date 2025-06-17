@@ -19,12 +19,12 @@ const progressManager = {
         localStorage.setItem('playerProgress', JSON.stringify(this.progress));
     },
 
-    isLevelUnlocked: function(levelIndex) {
-        if (levelIndex === 0) {
+    isLevelUnlocked: function(levelNumber) {
+        if (levelNumber === 1) {
             return true; // Level 1 is always unlocked
         }
         // A level is unlocked if the previous level is complete.
-        return this.progress.completedLevels.includes(levelIndex - 1);
+        return this.progress.completedLevels.includes(levelNumber - 2);
     },
 
     isLevelComplete: function(levelIndex) {

@@ -3,8 +3,8 @@ let currentLevelIndex = 0;
 
 const gameScreen = {
     enter: function() {
-        menuMusic.pause();
-        levelMusic.play();
+        window.menuMusic.pause();
+        window.levelMusic.play();
         console.log("Entered game screen.");
         if (currentLevelData) {
             this.level = new Level(currentLevelData);
@@ -13,9 +13,10 @@ const gameScreen = {
             currentLevelIndex = 0;
             this.level = new Level(LEVELS[currentLevelIndex]);
         }
-        // Start player at the bottom of the level
-        this.jumpSound = new Audio('assets/maro-jump-sound-effect_1.mp3');
-        this.player = new Player(100, (this.level.tiles.length - 2) * this.level.tileSize, this.jumpSound);
+        // Start player at the position defined in the level data
+        const startX = this.level.playerStart.x * this.level.tileSize;
+        const startY = this.level.playerStart.y * this.level.tileSize;
+        this.player = new Player(startX, startY, this.level);
         this.player.lives = 3; 
         camera.init(this.level); // Initialize camera
         this.coinsCollected = 0;
@@ -29,8 +30,8 @@ const gameScreen = {
         window.addEventListener("keyup", this.keyUpHandler);
     },
     exit: function() {
-        levelMusic.pause();
-        levelMusic.currentTime = 0;
+        window.levelMusic.pause();
+        window.levelMusic.currentTime = 0;
         console.log("Exiting game screen.");
         window.removeEventListener("keydown", this.keyDownHandler);
         window.removeEventListener("keyup", this.keyUpHandler);
@@ -49,8 +50,8 @@ const gameScreen = {
         
 
         if (playerStatus === 'coin_collected') {
-            coinSound.currentTime = 0;
-            coinSound.play();
+            window.coinSound.currentTime = 0;
+            window.coinSound.play();
             this.coinsCollected++;
         } else if (playerStatus === 'goal_reached') {
             if (this.coinsCollected === this.level.totalCoins) {
@@ -63,7 +64,7 @@ const gameScreen = {
         } else if (playerStatus === 'enemy_killed') {
             
         } else if (playerStatus === 'enemy_collision') {
-            lostALifeSound.play();
+            window.lifeLostSound.play();
             this.player.lives--;
             this.player.isInvincible = true;
             this.player.invincibilityTimer = 90; 
